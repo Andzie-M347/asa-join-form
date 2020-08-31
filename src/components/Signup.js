@@ -18,14 +18,14 @@ function Signup() {
       required: true,
       validator: {
         func: (value) => /^[a-zA-Z]+$/.test(value),
-        error: "Invalid first name format.",
+        error: "Invalid first name.",
       },
     },
     last_name: {
       required: true,
       validator: {
         func: (value) => /^[a-zA-Z]+$/.test(value),
-        error: "Invalid last name format.",
+        error: "Invalid last name.",
       },
     },
     email: {
