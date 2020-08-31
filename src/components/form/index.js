@@ -1,13 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { get_prop_values, is_object, is_required, VALUE, ERROR } from "./Utils";
 
-/**
- * useForm hooks to handle your validation in your forms
- *
- * @param {object} stateSchema stateSchema.
- * @param {object} stateValidatorSchema stateSchemaValidation to validate your forms in react.
- * @param {function} submitFormCallback function to be execute during form submission.
- */
 function useForm(
   stateSchema = {},
   stateValidatorSchema = {},
@@ -23,7 +16,6 @@ function useForm(
   const [disable, setDisable] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Get a local copy of stateSchema
   useEffect(() => {
     setStateSchema(stateSchema);
 
@@ -46,7 +38,6 @@ function useForm(
     setErrors(errors);
   }, [state]); // eslint-disable-line
 
-  // Run validation if validatorSchema was already set or has change...
   useEffect(() => {
     const errors = Object.keys(values).reduce((accu, curr) => {
       accu[curr] = validateField(curr, values[curr]);
@@ -56,8 +47,6 @@ function useForm(
     setErrors(errors);
   }, [validatorSchema]); // eslint-disable-line
 
-  // For every changed in our state this will be fired
-  // To be able to disable the button
   useEffect(() => {
     if (isDirty) {
       setDisable(validateErrorState());
@@ -91,8 +80,6 @@ function useForm(
         return error;
       }
 
-      // Bail out if field is not required and no value set.
-      // To prevent proceeding to validator function
       if (!fieldValidator["required"] && !value) {
         return error;
       }
@@ -121,31 +108,21 @@ function useForm(
     [validatorSchema, values]
   );
 
-  // Set Initial Error State
-  // When hooks was first rendered...
   const setInitialErrorState = useCallback(() => {
     Object.keys(errors).map((name) =>
       setFieldError({ name, error: validateField(name, values[name]) })
     );
   }, [errors, values, validateField]);
 
-  // Used to disable submit button if there's a value in errors
-  // or the required field in state has no value.
-  // Wrapped in useCallback to cached the function to avoid intensive memory leaked
-  // in every re-render in component
   const validateErrorState = useCallback(
     () => Object.values(errors).some((error) => error),
     [errors]
   );
 
-  // Use this callback function to safely submit the form
-  // without any errors in state...
   const handleOnSubmit = useCallback(
     (event) => {
       event.preventDefault();
 
-      // Making sure that there's no error in the state
-      // before calling the submit callback function
       if (!validateErrorState()) {
         submitFormCallback(values);
       }
